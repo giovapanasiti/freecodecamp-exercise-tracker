@@ -92,51 +92,36 @@ app.get('/api/exercise/log', (req, res, next) => {
   
   const limitOptions = {};
     if (limit) limitOptions.limit = limit;
-//     User.findById(userId)
-//       .populate({path: 'log', match: {}, select : '-_id', options: limitOptions})
-//       .exec((error, user) => {
       
-//         console.error('Testing invalid userId. After looking for the user, before if(error) and if(user).')
-//         console.error('error: ' + error);
-//         console.error('user: ' + user);
-      
-//         if(error) return res.send({error: error});  
-//         if (user){
-//           const dataToShow = {id: user._id, username: user.username, count: user.count};
-//           if (from) dataToShow.from = from.toDateString();
-//           if (to) dataToShow.to = to.toDateString();
-//           dataToShow.log = user.log.filter((ej) => {
-//             if (from && to) {
-//               return ej.date >= from && ej.date <= to;
-//             } else if (from) {
-//               return ej.date >= from;
-//            } else if (to) {
-//              return ej.date <= to;
-//            } else {
-//              return true;
-//            }
-//           });
-//           res.json(dataToShow);
-//         } else {
-//           res.send({error: 'User not foundd'});
-//         }
-//     });
-    Exercise.find({userId:userId, date: {$lt: from}}).exec((err, exercises) => {
-      if (err) {
-        return res.send({error: err})
-      }
-      res.send({results: exercises})
-    })
-      
-       //  if (from && to) {
-       //    return 
-       //  } else if (from) {
-       //    return ej.date >= from;
-       // } else if (to) {
-       //   return ej.date <= to;
-       // } else {
-       //   return true;
-       // }
+        if (from && to) {
+          Exercise.find({ $and: [ { userId:userId }, { date: {$gt: new Date(from)} }, { date: {$lt: new Date(to)} } ] } ).limit(parseInt(limit)).exec((err, exercises) => {
+            if (err) {
+              return res.send({error: err})
+            }
+            return res.send({results: exercises})
+          })
+        } else if (from) {
+          Exercise.find({ $and: [ { userId:userId }, { date: {$gt: new Date(from)} } ] } ).limit(parseInt(limit)).exec((err, exercises) => {
+            if (err) {
+              return res.send({error: err})
+            }
+            return res.send({results: exercises})
+          })
+       } else if (to) {
+         Exercise.find({ $and: [ { userId:userId }, { date: {$lt: new Date(to)} } ] } ).limit(parseInt(limit)).exec((err, exercises) => {
+            if (err) {
+              return res.send({error: err})
+            }
+            return res.send({results: exercises})
+          })
+       } else {
+         Exercise.find({ userId:userId } ).limit(parseInt(limit)).exec((err, exercises) => {
+            if (err) {
+              return res.send({error: err})
+            }
+            return res.send({results: exercises})
+          })
+       }
       
       
   
