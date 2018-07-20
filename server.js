@@ -4,17 +4,20 @@ const bodyParser = require('body-parser')
 
 const cors = require('cors')
 
+const User = require('./user-model')
+const Exercise = require('./exercise-model')
+
 const mongoose = require('mongoose')
 mongoose.connect(process.env.MLAB_URI || 'mongodb://localhost/exercise-track' )
 
 
-const Schema = mongoose.Schema;
+// const Schema = mongoose.Schema;
 
-const userSchema = new Schema({
-  username: String
-})
+// const UserSchema = new Schema({
+//   username: String
+// })
 
-module.exports =  mongoose.model('User', UserSchema)
+// mongoose.model('User', UserSchema)
 
 
 app.use(cors())
@@ -31,22 +34,47 @@ app.get('/', (req, res) => {
 app.post('/api/exercise/new-user', (req, res) => {
   console.log(req.body.username)
   
-  const user = new userSchema({
+  const user = new User({
     username: req.body.username
   });
   
-  user.save(function(ok, error) {
+  user.save(function(error, user) {
     if (error) {
       res.status(500).send('{error:' + error + ' }')
     }
     
     res.send({
-      ok: ok,
-      error: error
+      user: user
     })
   })
   
-  res.send
+//   5b51a269dbcc762c54236e3f <--user 
+  
+});
+
+
+app.post('/api/exercise/add', (req, res) => {
+  console.log(req.body.username)
+  
+  const exercise = new Exercise({
+    userId: req.body.userId,
+    description: req.body.description,
+    duration: parseInt(req.body.duration),
+    date: new Date(req.body.date)
+  });
+  
+  exercise.save(function(error, exercise) {
+    if (error) {
+      res.status(500).send('{error:' + error + ' }')
+    }
+    
+    res.send({
+      exercise: exercise
+    })
+  })
+  
+//   5b51a269dbcc762c54236e3f <--user 
+  
 });
 
 
